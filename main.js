@@ -1,23 +1,41 @@
 import './style.css'
-import javascriptLogo from './javascript.svg'
-import { setupCounter } from './counter.js'
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+const scene = new THREE.Scene();
 
-setupCounter(document.querySelector('#counter'))
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.querySelector('#bg'),
+});
+
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+camera.position.setZ(30);
+console.log(document.querySelector('#bg'));
+
+const moonTexture = new THREE.TextureLoader().load('moon.jpg')
+
+const geometry = new THREE.SphereGeometry( 15, 64, 32 );
+const material = new THREE.MeshBasicMaterial( { map: moonTexture });
+const sphere = new THREE.Mesh( geometry, material );
+scene.add( sphere );
+
+const pointLight = new THREE.SpotLight(0xffffff);
+
+pointLight.position.set(50,50,50);
+scene.add(pointLight);
+
+const controls = new OrbitControls(camera, renderer.domElement)
+
+function animate() {
+  requestAnimationFrame( animate );
+
+  sphere.rotation.y += 0.001;
+  controls.update()
+  renderer.render( scene, camera);
+}
+
+animate()
